@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<main class="layout layout--3">
+  <div class="container">
+    {% include 'core/communities_partial.html' %}
+    <div class="roomList">
+      <div class="mobile-menu">
+        <form action="{% url 'home' %}" method="GET" class="header__search">
+          <label>
+            <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+              <title>search</title>
+              <path
+                d="M32 30.586l-10.845-10.845c1.771-2.092 2.845-4.791 2.845-7.741 0-6.617-5.383-12-12-12s-12 5.383-12 12c0 6.617 5.383 12 12 12 2.949 0 5.649-1.074 7.741-2.845l10.845 10.845 1.414-1.414zM12 22c-5.514 0-10-4.486-10-10s4.486-10 10-10c5.514 0 10 4.486 10 10s-4.486 10-10 10z"
+              ></path>
+            </svg>
+            <input name="q" placeholder="Search for posts" />
+          </label>
+        </form>
+        <div class="mobile-menuItems">
+          <a class="btn btn--main btn--pill" href="{% url 'communities' %}">Browse Communities</a>
+        </div>
+      </div>
+      <div class="roomList__header">
+        <div>
+          <h2>Posts</h2>
+          <p>{{number_of_posts}} posts available</p>
+        </div>
+        <a class="btn btn--secondary" href="{% url 'create-community' %}">
+          <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+            <title>add</title>
+            <path
+              d="M16.943 0.943h-1.885v14.115h-14.115v1.885h14.115v14.115h1.885v-14.115h14.115v-1.885h-14.115v-14.115z"
+            ></path>
+          </svg>
+          Create Community
+        </a>
+        <a class="btn btn--main" href="{% url 'create-post' %}">
+          <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+            <title>add</title>
+            <path
+              d="M16.943 0.943h-1.885v14.115h-14.115v1.885h14.115v14.115h1.885v-14.115h14.115v-1.885h-14.115v-14.115z"
+            ></path>
+          </svg>
+          Create Post
+        </a>
+      </div>
+      {% include 'core/posts_partial.html' with posts=page_obj %}
+
+      {% block pagination %}
+        <div class="pagination">
+          <span class="step-links">
+            {% if page_obj.has_previous %}
+              <a href="?q={{ query }}&page={{ page_obj.previous_page_number }}">Previous</a>
+              {% if page_obj.number > 3 %}
+                <a href="?q={{ query }}&page=1">1</a>
+                {% if page_obj.number > 4 %}
+                  <span>...</span>
+                {% endif %}
+              {% endif %}
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+              {% if page_obj.number == num %}
+                <a href="?q={{ query }}&page={{ num }}">{{ num }}</a>
+              {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                <a href="?q={{ query }}&page={{ num }}">{{ num }}</a>
+              {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+              {% if page_obj.number < page_obj.paginator.num_pages|add:'-3' %}
+                <span>...</span>
+                <a href="?q={{ query }}&page={{ page_obj.paginator.num_pages }}">{{ page_obj.paginator.num_pages }}</a>
+              {% elif page_obj.number < page_obj.paginator.num_pages|add:'-2' %}
+                <span>...</span>
+                <a href="?q={{ query }}&page={{ page_obj.paginator.num_pages }}">{{ page_obj.paginator.num_pages }}</a>%
+              {% endif %}
+              <a href="?q={{ query }}&page={{ page_obj.next_page_number }}">Next</a>
+            {% endif %}
+          </span>
+        </div>
+      {% endblock %}
+
+    </div>
+    {% include 'core/activity_partial.html' %}
+  </div>
+</main>
+
+{% endblock %}
