@@ -13,8 +13,8 @@ urlpatterns = [
     path('posts/', include('core.urls')),
 
     path('api-auth/', include('rest_framework.urls')),
-    path('api/', include('core.api.urls')),
-    path('api/', include('users.api.urls')),
+    path('api/core/', include('core.api.urls')),
+    path('api/users/', include('users.api.urls')),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
