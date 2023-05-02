@@ -1,8 +1,9 @@
-from django.core.management.base import BaseCommand
 import logging
+
+from django.core.management.base import BaseCommand
+
 from core.models import Community, Post, Comment
 from users.models import User
-
 
 # python manage.py seed --mode=refresh
 """ Clear all data and creates addresses """
@@ -11,6 +12,7 @@ MODE_REFRESH = 'refresh'
 # python manage.py seed --mode=clear
 """ Clear all data and do not create any object """
 MODE_CLEAR = 'clear'
+
 
 class Command(BaseCommand):
     help = "seed database for testing and development."
@@ -28,6 +30,21 @@ def clear_data():
     """Deletes all the communities, posts and objects"""
     logging.info("Delete Communities Instances")
     Community.objects.all().delete()
+    User.objects.all().delete()
+
+
+def create_user(number: int):
+    """Creates a user"""
+    logging.info("Creating user")
+
+    user = User(
+        username=f'default{number}',
+        email=f'test{number}@example.com',
+        password='9iJ8Uh7yG'
+    )
+    user.save()
+    logging.info(f"{user} user created.")
+    return user
 
 
 def create_community(number: int):
@@ -90,16 +107,19 @@ def run_seed(self, mode):
         return
 
     # Seeding db
-    for number in range(1, 7):
+    for number in range(1, 8):
         create_community(number)
 
-    for number in range(1, 100):
+    for number in range(1, 11):
+        create_user(number)
+
+    for number in range(1, 101):
         create_post(number)
 
-    for number in range(1, 1000):
+    for number in range(1, 1001):
         create_comment(number, top_level=True)
 
-    for number in range(1, 10000):
+    for number in range(1, 10001):
         create_comment(number)
 
 
