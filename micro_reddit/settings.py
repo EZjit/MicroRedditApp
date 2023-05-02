@@ -101,6 +101,9 @@ DATABASES = {
         'PASSWORD': env('SQL_PASSWORD'),
         'HOST': env('SQL_HOST'),
         'PORT': env('SQL_PORT'),
+        'TEST': {
+            'NAME': 'test' + env('SQL_DATABASE'),
+        },
     }
 }
 

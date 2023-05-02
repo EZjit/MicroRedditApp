@@ -49,13 +49,13 @@ def test_user_email_unique(valid_user):
     user1 = valid_user
     with pytest.raises(IntegrityError) as e:
         mixer.blend(User, email=user1.email)
-    assert 'UNIQUE constraint failed' in str(e.value)
-    assert 'user.email' in str(e.value)
+    assert 'duplicate key value violates unique constraint' in str(e.value)
+    assert str(user1.email) in str(e.value)
 
 
 def test_user_username_unique(valid_user):
     user1 = valid_user
     with pytest.raises(IntegrityError) as e:
         mixer.blend(User, username=user1.username)
-    assert 'UNIQUE constraint failed' in str(e.value)
-    assert 'user.username' in str(e.value)
+    assert 'duplicate key value violates unique constraint' in str(e.value)
+    assert str(user1.username) in str(e.value)

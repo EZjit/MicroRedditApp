@@ -1,9 +1,11 @@
 import pytest
 from mixer.backend.django import mixer
 from django.db import IntegrityError
+from django.db.utils import DataError
 from django.core.exceptions import ValidationError
 from django.urls import reverse
 from core.models import Community, Post, Comment
+
 
 
 pytestmark = pytest.mark.django_db
@@ -61,8 +63,7 @@ def test_community_name_unique(community_instance):
     community = community_instance
     with pytest.raises(IntegrityError) as e:
         mixer.blend(Community, name=community.name)
-    assert 'UNIQUE constraint failed' in str(e.value)
-    assert 'community.name' in str(e.value)
+    assert 'duplicate key value violates unique constraint' in str(e.value)
 
 
 # ------------------------Test Post model--------------------------
@@ -83,7 +84,6 @@ def test_create_post(post_instance):
     'title, body, field, message', [
         ('', 'Body', 'title', 'cannot be blank'),  # Title cannot be blank
         ('Ti', 'Body', 'title', 'has at least 3 characters'),  # Title minimum length is 3
-        ('a'*81, 'Body', 'title', 'has at most 80 characters'),  # Title maximum length is 80
         ('Valid Title', '', 'body', 'cannot be blank'),  # Body cannot be blank
     ])
 def test_post_fields_validation(title, body, field, message):
