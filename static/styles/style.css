@@ -1398,6 +1398,6 @@ details.comment:not([open]) .comment-heading::after {
 }
 
 .pagination a:hover:not(.active) {
-  background-color: #ddd;
+  background-color: white;
   color: black;
 }
