@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.urls import reverse_lazy, reverse
 from django.views.generic.edit import CreateView, UpdateView
 from django.contrib.auth.decorators import login_required
@@ -22,7 +23,7 @@ class CommunityCreate(LoginRequiredMixin, CreateView):
     success_url = reverse_lazy('home')
 
 
-def communities_page(request):
+def communities_page(request: HttpRequest) -> HttpResponse:
     query = request.GET.get('q', '')
     communities = Community.objects.filter(name__icontains=query)
 
@@ -40,13 +41,13 @@ class PostCreate(LoginRequiredMixin, CreateView):
 
     redirect_field_name = 'next'
 
-    def form_valid(self, form):
+    def form_valid(self, form) -> HttpResponseRedirect:
         form.instance.user = self.request.user
         return super().form_valid(form)
 
 
-def show_post(request, id):
-    post = get_object_or_404(Post, id=id)
+def show_post(request: HttpRequest, pk: int) -> HttpResponse:
+    post = get_object_or_404(Post, id=pk)
     post_top_level_comments = post.get_comments().select_related('user')
     post_comments_num = post.comments.count()
 
@@ -81,17 +82,17 @@ class PostEdit(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
     redirect_field_name = 'next'
 
-    def get_success_url(self):
+    def get_success_url(self) -> str:
         return reverse('post', args=[self.object.id])
 
-    def test_func(self):
+    def test_func(self) -> bool:
         post = self.get_object()
         return self.request.user == post.user
 
 
 @login_required()
-def delete_post(request, id):
-    post = get_object_or_404(Post, id=id)
+def delete_post(request: HttpRequest, pk: int) -> HttpResponse:
+    post = get_object_or_404(Post, id=pk)
 
     if request.user != post.user:
         raise PermissionDenied()
@@ -107,7 +108,7 @@ def delete_post(request, id):
 # Comment Views
 
 @login_required()
-def reply_comment(request):
+def reply_comment(request: HttpRequest) -> HttpResponseRedirect:
     if request.method == 'POST':
         form = CommentForm(request.POST)
 
@@ -127,10 +128,9 @@ def reply_comment(request):
             return redirect(post.get_absolute_url()+'#comment-'+str(reply.id))
 
 
-
 @login_required()
-def delete_comment(request, id):
-    comment = get_object_or_404(Comment, id=id)
+def delete_comment(request: HttpRequest, pk: int) -> HttpResponse:
+    comment = get_object_or_404(Comment, id=pk)
     post = comment.post
 
     if request.user != comment.user:
@@ -146,7 +146,7 @@ def delete_comment(request, id):
 
 # Common Views
 
-def home_page(request):
+def home_page(request: HttpRequest) -> HttpResponse:
     query = request.GET.get('q', '')
     page_number = request.GET.get('page', 1)
     number_of_posts = Post.objects.count()

@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.urls import reverse_lazy
 from django.views.generic.edit import CreateView
 from django.contrib.auth.decorators import login_required
@@ -13,8 +14,8 @@ class SignUpView(CreateView):
     success_url = reverse_lazy('login')
 
 
-def show_profile(request, id):
-    user = get_object_or_404(User, id=id)
+def show_profile(request: HttpRequest, pk: int) -> HttpResponse:
+    user = get_object_or_404(User, id=pk)
     user_posts = user.posts.prefetch_related('user', 'comments', 'community')
     communities = Community.objects.prefetch_related('posts')[:5]
     recent_comments = Comment.objects.select_related('user', 'post')[:10]
@@ -28,8 +29,8 @@ def show_profile(request, id):
     return render(request, 'users/profile.html', context)
 
 
-@login_required(login_url='login')
-def edit_profile(request):
+@login_required()
+def edit_profile(request: HttpRequest) -> HttpResponse:
     user = request.user
     form = CustomUserChangeForm(request.POST or None, instance=user)
 
@@ -40,8 +41,8 @@ def edit_profile(request):
     return render(request, 'users/edit_profile.html', {'form': form})
 
 
-@login_required(login_url='login')
-def delete_profile(request):
+@login_required()
+def delete_profile(request: HttpRequest) -> HttpResponse:
     user = request.user
 
     if request.method == 'POST':

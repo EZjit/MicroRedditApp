@@ -17,5 +17,5 @@ class User(AbstractUser):
 
     objects = CustomUserManager()
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.email
