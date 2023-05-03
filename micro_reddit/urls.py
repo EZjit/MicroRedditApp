@@ -6,8 +6,8 @@ from core.views import home_page
 
 
 urlpatterns = [
-    path("", home_page, name='home'),
     path('admin/', admin.site.urls),
+    path("", home_page, name='home'),
     path('users/', include('users.urls')),
     path('users/', include('django.contrib.auth.urls')),
     path('posts/', include('core.urls')),
@@ -15,6 +15,8 @@ urlpatterns = [
     path('api-auth/', include('rest_framework.urls')),
     path('api/core/', include('core.api.urls')),
     path('api/users/', include('users.api.urls')),
+
+    # path('__debug__/', include('debug_toolbar.urls')),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

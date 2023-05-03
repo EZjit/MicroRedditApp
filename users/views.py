@@ -15,7 +15,7 @@ class SignUpView(CreateView):
 
 def show_profile(request, id):
     user = get_object_or_404(User, id=id)
-    user_posts = user.posts.prefetch_related('user', 'comments')
+    user_posts = user.posts.prefetch_related('user', 'comments', 'community')
     communities = Community.objects.prefetch_related('posts')[:5]
     recent_comments = Comment.objects.select_related('user', 'post')[:10]
     context = {
