@@ -91,19 +91,15 @@
         {% with comments.count as total_comments %}
           <h1 class="comments_section_header">
             <strong>
-            {{ post_comments.count }} comment{{ post_comments.count|pluralize }}
+            {{ post_comments_num }} comment{{ post_comments_num|pluralize }}
             </strong>
           </h1>
         {% endwith %}
-        {% if not post.comments.all %}
-          No comments yet
-        {% else %}
-          <div class="comment-thread">
-            {% for comment in post.get_comments %}
-              {% include 'core/comment_partial.html' with comment=comment %}
-            {% endfor %}
-          </div>
-        {% endif %}
+        <div class="comment-thread">
+          {% for comment in post_top_level_comments %}
+            {% include 'core/comment_partial.html' %}
+          {% endfor %}
+        </div>
       </div>
     </div>
     {% include 'core/community_detail_partial.html' with community=post.community %}

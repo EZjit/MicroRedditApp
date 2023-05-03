@@ -3,7 +3,6 @@ from django.urls import reverse_lazy, reverse
 from django.views.generic.edit import CreateView, UpdateView
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.db.models import Q
@@ -48,9 +47,9 @@ class PostCreate(LoginRequiredMixin, CreateView):
 
 def show_post(request, id):
     post = get_object_or_404(Post, id=id)
-    post_comments = post.comments.all()
+    post_top_level_comments = post.get_comments().select_related('user')
+    post_comments_num = post.comments.count()
 
-    new_comment = None
     # We allow users to comment on this post
     comment_form = CommentForm()
 
@@ -66,8 +65,9 @@ def show_post(request, id):
 
     context = {
         'post': post,
-        'post_comments': post_comments,
+        'post_comments_num': post_comments_num,
         'comment_form': comment_form,
+        'post_top_level_comments': post_top_level_comments,
         }
 
     return render(request, 'core/post_detail.html', context)
@@ -144,8 +144,6 @@ def delete_comment(request, id):
     return render(request, 'delete.html', context)
 
 
-
-
 # Common Views
 
 def home_page(request):
@@ -156,7 +154,7 @@ def home_page(request):
         Q(community__name__icontains=query) |
         Q(title__icontains=query) |
         Q(body__icontains=query)
-    )
+    ).prefetch_related('user', 'community', 'comments')
 
     paginator = Paginator(posts, per_page=10)
 
@@ -169,10 +167,10 @@ def home_page(request):
     except EmptyPage:
         page_object = paginator.get_page(paginator.num_pages)
 
-    communities = Community.objects.all()[:5]
+    communities = Community.objects.prefetch_related('posts')[:5]
     community_comments = Comment.objects.filter(
         Q(post__community__name__icontains=query)
-    )[:10]
+    ).select_related('user', 'post')[:10]
 
     context = {
         'page_obj': page_object,

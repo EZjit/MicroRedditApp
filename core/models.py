@@ -22,11 +22,16 @@ class Community(models.Model):
 
 
 class Post(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='posts',
+    )
     community = models.ForeignKey(
         Community,
         on_delete=models.CASCADE,
         verbose_name='Choose a community',
+        related_name='posts'
         )
     title = models.CharField(
         max_length=80,
@@ -51,7 +56,8 @@ class Post(models.Model):
 
 
 class Comment(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE,
+                             related_name='comments')
     post = models.ForeignKey(Post, on_delete=models.CASCADE,
                              related_name='comments')
     parent = models.ForeignKey('self', on_delete=models.CASCADE,

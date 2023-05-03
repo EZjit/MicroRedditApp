@@ -8,7 +8,7 @@
     </li>
     {% for community in communities %}
       <li>
-        <a href="{% url 'home' %}?q={{community.name}}">{{community.name}}<span>{{community.post_set.all.count}}</span></a>
+        <a href="{% url 'home' %}?q={{community.name}}">{{community.name}}<span>{{community.posts.all.count}}</span></a>
       </li>
     {% endfor %}
   </ul>

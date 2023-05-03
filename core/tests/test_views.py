@@ -199,8 +199,9 @@ def test_show_post_view_context(client, create_post_page_context):
     post = create_post_page_context
     response = client.get(reverse('post', args=[post.id]))
     assert response.context['post'] == post
-    assert list(response.context['post_comments']) == list(Comment.objects.filter(post=post))
+    assert response.context['post_comments_num'] == post.comments.count()
     assert isinstance(response.context['comment_form'], CommentForm)
+    assert list(response.context['post_top_level_comments']) == list(post.get_comments())
 
 
 def test_show_post_view_with_invalid_post_id(client):
